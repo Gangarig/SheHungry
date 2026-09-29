@@ -1,49 +1,54 @@
-# SheHungry — Product Specification
+# SheHungry — Product Blueprint
 
-## Product idea
-SheHungry answers one question quickly: **What should I eat nearby?**
+## One-line product
+**SheHungry helps you answer “What should we eat?” by swiping through nearby restaurants until something feels right.**
 
-The product is a visual restaurant/food discovery experience inspired by the simplicity of swipe and short-form content interfaces, without becoming a social network.
+The recurring joke behind the product is simple: choosing where to eat together can take longer than eating. SheHungry turns that indecision into a fast, playful decision loop.
 
-## Core loop
-1. Open SheHungry.
-2. Allow location access.
-3. Choose travel mode/time and lightweight food preferences.
-4. See one nearby restaurant/food card at a time.
-5. Swipe left to skip or right to like/save.
-6. Continue until something looks good.
-7. Open the restaurant details/location and go eat.
+## Core experience
+Open → location → lightweight preferences → swipe nearby restaurant cards → left skips → right likes/saves → open the restaurant and go.
 
-## MVP principles
-- Guest-first: browsing works without signup.
-- One primary interaction: left/right swipe.
-- Mouse drag and touch swipe use the same behavior.
-- Fast, image-first, minimal UI.
-- Few screens and few decisions.
-- No social feed, comments, creator system, or unnecessary features in V1.
+The swipe is the product, not decoration. Everything else exists to supply good cards or act on the decision.
 
-## MVP features
-- Guest browsing.
-- Location permission.
-- Travel mode: walk, cycle, drive.
-- Travel-time filter up to 60 minutes.
-- Restaurant card with photo, name, cuisine, distance/travel context.
-- Swipe left = skip.
-- Swipe right = like/save.
-- Drag below threshold = snap back.
-- Google/Apple authentication only when needed for persistent favourites or after the configured guest swipe limit.
-- Favourites list.
+## MVP
+- guest-first discovery; no account wall
+- location permission with graceful denial/manual-area fallback when implemented
+- responsive restaurant card deck
+- touch swipe on phone; click-drag/pointer on web; accessible buttons/keyboard alternative
+- left = skip, right = like/save intent
+- restaurant photo, name, cuisine/category, useful distance context, rating/price where legitimately available
+- small lightweight filters
+- favourites with authentication when persistence is needed
+- restaurant detail/action screen
+- real-device iPhone + responsive web support
 
-## Business model
-Users use the discovery product for free. Restaurants are listed normally by default. A later version may let restaurants pay for clearly identified boosted placement. Payments are not part of MVP.
+## Product principles
+1. One obvious action per moment.
+2. Food photography is the visual hero.
+3. Immediate feedback; network latency never drives gesture animation.
+4. Guest first, identity later.
+5. Simple enough to explain in one sentence.
+6. Provider/API costs are bounded by architecture, not hope.
+7. Privacy: do not build unnecessary location history.
+8. Familiar swipe interaction, original SheHungry branding.
 
-## Later — explicitly outside MVP
-- Restaurant boosts and Stripe subscriptions.
-- Group mode: friends join with a code, swipe, and see the most-voted restaurant.
-- Reservation links.
-- Delivery links.
-- Call action.
-- More immersive vertical food discovery/feed presentation.
+## Important scope decision
+A radius/distance filter is not the same as “15 minutes walking/driving.” True travel-time filtering requires routing/travel-time data. The architecture keeps that capability replaceable; MVP must not label straight-line estimates as real travel time.
 
-## Product constraint
-Every feature must support the core job: helping a nearby user decide what to eat with minimal effort.
+## Business model — later
+Users remain free. Restaurants may later purchase clearly identified boosted placement. Paid ranking must not silently masquerade as organic discovery. Stripe and restaurant billing are outside MVP.
+
+## Later versions
+- restaurant boosts/subscriptions
+- group mode: friends/partners join a room, swipe the same candidate pool and reveal shared likes / a winner
+- reservation, delivery and call actions
+- richer vertical short-form food discovery presentation
+
+## Non-goals for MVP
+Social feed, creators, comments, restaurant dashboards, payments, recommendation ML, chat, complex profiles, delivery ordering, group mode.
+
+## MVP definition of success
+A person in Vienna can open SheHungry, get relevant nearby cards, swipe continuously without waiting between ordinary cards, save a place and reach the information needed to go eat. The experience works naturally with a finger on iPhone and click-drag on web.
+
+## Source of truth
+Detailed decisions live in the focused files in /docs. Keep them small and load only the relevant file(s) during implementation to reduce context/token usage.
