@@ -1,76 +1,64 @@
-# SheHungry — Visual Identity & Design System
+# SheHungry — Design System
 
-## Brand direction
-Simple, energetic, food-first, playful without looking childish. The interface should make restaurant photography the visual hero while using a small number of strong accent colors for actions and feedback.
+## Personality
+Warm, playful, appetizing, fast and modern. Not childish, not a Tinder clone, not a generic delivery app. Food photos carry most of the visual emotion.
 
-## Logo concept
-**SheHungry** wordmark + a minimal bite/swipe mark.
+## Brand idea
+SheHungry turns “I don’t know what I want” into a playful swipe. The visual mark should suggest appetite + choice/motion without copying another app’s iconography.
 
-The mark should work as:
-- app icon,
-- favicon,
-- compact header logo,
-- social/avatar mark.
+## Logo direction
+Primary: **SheHungry** wordmark with a compact original food/swipe mark. The mark must survive at app-icon/favicon size. Maintain a simple one-color fallback.
 
-Do not build the identity around copied Tinder/Instagram/TikTok symbols. The interaction inspiration is swipe simplicity; SheHungry keeps its own visual identity.
+The generated concept image in this planning session is visual exploration, not a final trademark/production asset. Final logo should be redrawn as clean vector artwork before release.
 
-## Color tokens
-Use semantic tokens instead of hardcoding colors in components.
+## Core palette
+- background #FFF9F5 warm cream
+- surface #FFFFFF
+- text #201A17
+- textMuted #756A64
+- primary #FF4F64 coral
+- primaryPressed #E63F54
+- accent #FFB547 warm amber
+- like #20B486
+- skip #6E6872
+- border #EEE5DF
 
-### Light theme
-- `background`: #FFF9F5 — warm off-white
-- `surface`: #FFFFFF
-- `text`: #201A17 — near-black warm neutral
-- `textMuted`: #756A64
-- `primary`: #FF4F64 — energetic coral/red
-- `primaryPressed`: #E63F54
-- `accent`: #FFB547 — warm appetite/orange accent
-- `like`: #20B486 — positive green
-- `skip`: #6E6872 — neutral skip
-- `border`: #EEE5DF
-
-### Usage rule
-Restaurant imagery supplies most visual variety. Strong colors are reserved for brand, interaction feedback, CTAs, and small highlights. Avoid rainbow UI or large competing gradients.
+Use semantic tokens; never hardcode brand values in feature components.
 
 ## Typography
-Use one clean sans-serif family throughout the MVP. Prefer a cross-platform/system-friendly font strategy so typography does not become an early performance or build dependency.
+One clean sans-serif family/system strategy for MVP. Strong compact restaurant titles, highly readable metadata. Avoid adding font dependencies merely for decoration.
 
-Roles:
-- Display: bold, compact headlines.
-- Title: restaurant/card names.
-- Body: descriptions/filter text.
-- Label: cuisine, distance, metadata.
+## Components
+Foundation: AppText, Button, IconButton, Chip, Sheet/Modal, LoadingState, EmptyState.
+Discovery: RestaurantCard, SwipeCard, SwipeDeck, SwipeActions, FilterBar, LocationControl.
+Restaurant: RestaurantHero, MetadataRow, ActionBar.
+Favourites: FavouriteCard/List.
 
-## Shape
-- Cards: large rounded corners.
-- Buttons: circular or pill-shaped depending on context.
-- Chips: pill-shaped.
-- Shadows: subtle; card depth should come primarily from stacking and movement.
+## Card anatomy
+Large food image → subtle readable gradient if needed → restaurant name → concise cuisine/metadata → distance/travel info → minimal action affordances. Avoid paragraphs on the swipe card.
 
 ## Swipe feedback
-- Drag right: progressively reveal LIKE feedback.
-- Drag left: progressively reveal SKIP feedback.
-- Below threshold: card returns to center.
-- Above threshold: card exits naturally with modest rotation/velocity.
-- Never make feedback obscure the restaurant photo.
+Right reveals a clear LIKE/heart treatment; left reveals SKIP/pass. Color is supportive, never the only cue. Under threshold snaps back. Accepted card exits quickly. Next card is already visible.
 
 ## Motion
-Motion should feel responsive rather than decorative.
-- Direct 1:1 drag tracking.
-- Small rotation based on horizontal displacement.
-- Spring snap-back.
-- Fast off-screen completion after accepted swipe.
-- Next card already visible beneath current card.
+Direct drag, restrained rotation, spring return, quick commit. Motion communicates state rather than decorating the screen. Respect reduced-motion settings.
 
-## Responsive behavior
-The swipe experience is centered and constrained on wide desktop screens instead of stretching the card. On mobile it uses most available width/height. Mouse, trackpad, pointer, and touch should map to the same interaction model.
+## Responsive
+Mobile: card uses most useful viewport while preserving safe areas/actions.
+Desktop: centered constrained phone-like discovery column; do not stretch card across the browser. Pointer drag and buttons behave like touch semantics.
 
 ## Accessibility
-- Do not rely only on red/green color to communicate swipe meaning.
-- Provide visible/tappable Skip and Like controls as an alternative to gestures.
-- Maintain readable contrast.
-- Respect reduced-motion preferences where supported.
-- Interactive targets must remain comfortably tappable.
+Readable contrast, large targets, screen-reader labels, button alternatives to gestures, keyboard support on web, reduced motion.
 
-## Design principle
-The UI should create energy through great food photography, fast motion, and a few strong semantic colors—not through visual clutter.
+## Visual restraint
+No rainbow gradients, excessive glass effects, multiple competing CTAs or dense navigation. The dopamine/energy comes from great food imagery, fast tactile motion and satisfying feedback.
+
+## Initial screens
+1. Entry/permission
+2. Discover/swipe
+3. Filters/location sheet
+4. Restaurant detail
+5. Favourites
+6. Sign-in prompt
+
+Keep bottom navigation minimal or omit it until multiple destinations genuinely need it.
