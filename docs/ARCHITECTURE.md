@@ -1,94 +1,72 @@
 # SheHungry — System Architecture
 
-## Architecture goals
-- Keep MVP simple.
-- Reuse components across web and touch devices.
-- Keep external API usage controlled.
-- Separate UI, domain logic, data access, and third-party integrations.
-- Leave clean extension points for later features without implementing them early.
+## Goals
+Simple MVP, shared web/mobile code, instant swipe feel, controlled provider costs, secure secrets, replaceable integrations.
 
-## High-level system
+## System
+Expo React Native app (iOS + web)
+→ feature hooks/domain services
+→ Supabase Auth/Postgres/RLS
+→ controlled server/provider boundary
+→ Google Places initially
+→ optional routing provider when true travel-time filtering is implemented
 
-Client (Expo / React Native / Web)
-→ application hooks/services
-→ Supabase client + SheHungry backend functions
-→ Supabase Postgres/Auth/Storage
-→ controlled external providers such as Google Places
+Swipe UI never talks directly to Places.
 
-The swipe UI never calls Google Places directly for every swipe. It consumes normalized restaurant records supplied by the application data layer.
+## Layers
+### Presentation
+Routes, reusable UI, SwipeCard/SwipeDeck, filters, states. No provider-specific objects.
 
-## Frontend responsibilities
-- Rendering screens and reusable UI.
-- Pointer/touch gesture handling.
-- Maintaining the small in-memory swipe deck.
-- Optimistic swipe transitions.
-- Calling application hooks/services.
-- Authentication UI when required.
+### Feature/domain
+Discovery criteria, deck progression, favourites and semantic swipe decisions. Pure logic where possible.
 
-## Backend/data responsibilities
-- User authentication and identity.
-- Restaurant cache.
-- Favourites.
-- Swipe history/log.
-- Access control with RLS.
-- Server-side external API calls where secrets or centralized caching are required.
+### Data/services
+Supabase repositories, Places adapter, location/routing adapter. Convert external data into stable SheHungry domain types.
 
-## Core domains
-### Discovery
-Gets nearby restaurant candidates based on location/filter inputs and supplies normalized cards.
+### Backend boundary
+Operations needing private credentials, central rate control or provider aggregation run server-side. Never ship service-role/private provider credentials to clients.
 
-### Swipe
-Processes left/right decisions independently from gesture rendering. UI animation and persistence are separate concerns.
-
-### Favourites
-Persists liked/saved restaurants for authenticated users. Guest state may remain local until authentication.
-
-### Auth
-Supabase Auth. Authentication should not block initial browsing.
-
-### Restaurant provider
-Adapter boundary around Google Places. Provider-specific response objects must not leak into UI components.
-
-## Data flow for discovery
-1. User grants location and chooses filters.
-2. Discovery hook requests restaurant candidates.
-3. Application checks reusable cached restaurant data.
-4. Missing/stale discovery data is fetched through the provider integration.
-5. Provider results are normalized and cached.
-6. Client receives a small card batch.
-7. Client preloads the next cards/images so swiping does not wait on a network request.
+## Discovery flow
+1. Resolve location/permission and filters.
+2. Build canonical DiscoveryCriteria.
+3. Query cached/known candidate records.
+4. Fetch missing/current provider data through controlled integration when required.
+5. Normalize to Restaurant domain records.
+6. Exclude current-session/user swiped candidates as appropriate.
+7. Return a batch to the client.
+8. Client preloads only the next small set of images/cards.
+9. Refill before buffer exhaustion.
 
 ## Swipe flow
-1. User drags current card.
-2. Gesture updates only local animation state.
-3. Crossing the release threshold determines LEFT or RIGHT.
-4. Card animates off-screen immediately.
-5. Next preloaded card becomes active.
-6. Swipe decision is persisted asynchronously.
-7. Failed persistence must not freeze the gesture animation; application state handles retry/error behavior.
+Gesture is local and immediate → semantic LEFT/RIGHT decision → animate out → advance preloaded card → persist/log asynchronously. Persistence failure cannot freeze the gesture.
+
+## Location/travel architecture
+Keep three concepts separate:
+- coordinates / area
+- straight-line distance
+- actual route/travel duration
+
+If MVP shows true walking/cycling/driving minutes, use an appropriate routing/travel-time service through a RoutingProvider interface. If routing is not yet implemented, display honest distance/radius information instead.
 
 ## API boundaries
-MVP integrations should remain deliberately few:
-1. Supabase — database/auth/storage/backend functions.
-2. Google Places — restaurant/place discovery and provider data.
-3. Google/Apple identity through Supabase Auth when enabled.
+MVP: Supabase, Google Places, identity providers through Supabase. Routing is optional depending on travel-time scope. Stripe is later.
 
-Stripe is a reserved future integration, not an active MVP dependency.
+## Security/privacy
+- RLS on user-owned rows
+- private credentials server-side
+- validate/rate-limit callable operations
+- restaurant cache read-only to normal clients
+- do not persist exact location history without a product need
+- minimum data collection
 
-## Security
-- No service-role or private provider secret in client code.
-- Supabase RLS on user-owned records.
-- Users can only modify their own favourites/swipe records.
-- Validate server-side inputs to provider/backend operations.
-- Public restaurant cache is read-only from normal clients unless a controlled backend operation updates it.
+## Reliability
+Cached candidates may keep discovery useful during provider errors where provider terms allow. Empty/error states stop retry loops. External calls have timeouts, bounded retry and observability.
 
-## Performance rules
-- Never make an external provider request per swipe.
-- Fetch cards in batches.
-- Keep a small preloaded card buffer.
-- Prefetch upcoming images.
-- Cache normalized restaurant/provider data.
-- Keep gesture animation on the client and independent of network latency.
+## Performance
+No provider request per swipe. Batch discovery, small deck buffer, image prefetch, optimistic gesture progression, deduplicated requests, stable domain models.
 
-## Future extension boundaries
-Future modules may add billing, restaurant accounts/boosts, group sessions, reservations, delivery, and richer feed modes. These must attach through services/domain modules rather than adding logic directly to SwipeCard.
+## Replaceability
+Interfaces: RestaurantProvider, RoutingProvider, FavouritesRepository, SwipeRepository. Later billing/group/reservation modules attach outside SwipeCard.
+
+## Environments
+Use development and production configuration separately. Database schema is reproducible from migrations. Secrets remain outside Git.
