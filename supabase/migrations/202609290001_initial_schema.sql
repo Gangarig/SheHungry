@@ -4,6 +4,15 @@ create table public.swipes (id uuid primary key default gen_random_uuid(), user_
 create table public.favourites (user_id uuid not null references auth.users(id) on delete cascade, restaurant_id uuid not null references public.restaurants(id) on delete cascade, created_at timestamptz not null default now(), primary key (user_id, restaurant_id));
 create index swipes_user_restaurant_idx on public.swipes (user_id, restaurant_id, created_at desc);
 alter table public.restaurants enable row level security; alter table public.swipes enable row level security; alter table public.favourites enable row level security;
-create policy "restaurant catalog is public" on public.restaurants for select using (true);
-create policy "users own swipes" on public.swipes for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "users own favourites" on public.favourites for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+grant usage on schema public to anon, authenticated;
+grant select on public.restaurants to anon, authenticated;
+grant select, insert, update, delete on public.swipes to authenticated;
+grant select, insert, update, delete on public.favourites to authenticated;
+create policy "restaurant catalog is public" on public.restaurants for select to anon, authenticated using (true);
+create policy "users can read their swipes" on public.swipes for select to authenticated using ((select auth.uid()) = user_id);
+create policy "users can create their swipes" on public.swipes for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "users can update their swipes" on public.swipes for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "users can delete their swipes" on public.swipes for delete to authenticated using ((select auth.uid()) = user_id);
+create policy "users can read their favourites" on public.favourites for select to authenticated using ((select auth.uid()) = user_id);
+create policy "users can create their favourites" on public.favourites for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "users can delete their favourites" on public.favourites for delete to authenticated using ((select auth.uid()) = user_id);
