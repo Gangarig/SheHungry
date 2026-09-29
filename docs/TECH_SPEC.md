@@ -1,125 +1,102 @@
 # SheHungry — Technical Specification
 
 ## Stack
-- TypeScript with strict typing.
-- React Native + Expo.
-- Expo Router for route/file organization.
-- React Native Web through Expo for web delivery.
-- Supabase for Postgres, Auth, Storage, RLS and controlled backend operations.
-- Google Places behind an integration/service boundary.
-- Stripe reserved for later billing work.
+- TypeScript strict
+- React Native + Expo
+- Expo Router
+- React Native Web
+- Supabase: Postgres, Auth, RLS, backend capabilities
+- Google Places through adapter/backend boundary
+- gesture/animation library chosen during implementation spike based on current Expo compatibility
+- Stripe later only
 
-Exact package versions should be locked when implementation starts rather than hard-coded into this planning document.
+Lock exact package versions when implementation begins.
 
-## Repository structure
+## Repository
 ```text
 SheHungry/
-├── app/                         # Expo Router route files only
+├── app/                         # routes/composition only
 │   ├── _layout.tsx
-│   ├── index.tsx                # entry/discovery redirect or screen
+│   ├── index.tsx
 │   ├── discover.tsx
 │   ├── favourites.tsx
-│   ├── restaurant/
-│   │   └── [id].tsx
-│   └── auth/
-│       └── sign-in.tsx
-│
+│   ├── restaurant/[id].tsx
+│   └── auth/sign-in.tsx
 ├── src/
 │   ├── components/
-│   │   ├── ui/                  # Button, Chip, IconButton, Text, etc.
-│   │   └── swipe/               # SwipeDeck, SwipeCard, SwipeActions
+│   │   ├── ui/
+│   │   └── swipe/
 │   ├── features/
 │   │   ├── discovery/
-│   │   │   ├── components/
-│   │   │   ├── hooks/
-│   │   │   ├── services/
-│   │   │   └── types.ts
 │   │   ├── favourites/
 │   │   └── auth/
-│   ├── hooks/                   # truly cross-feature hooks only
 │   ├── services/
 │   │   ├── supabase/
-│   │   └── places/
-│   ├── lib/                     # pure helpers/configuration
+│   │   ├── places/
+│   │   └── routing/
+│   ├── hooks/
+│   ├── lib/
 │   ├── theme/
-│   │   ├── colors.ts
-│   │   ├── spacing.ts
-│   │   ├── typography.ts
-│   │   └── index.ts
-│   ├── types/                   # shared application types
+│   ├── types/
 │   └── constants/
-│
-├── assets/
-│   ├── fonts/
-│   ├── icons/
-│   └── images/
-│
-├── supabase/
-│   ├── migrations/
-│   └── functions/               # only when server-side functions are needed
-│
-├── docs/                        # project source-of-truth specifications
+├── assets/{fonts,icons,images}/
+├── supabase/{migrations,functions}/
+├── docs/
 ├── .env.example
 ├── app.json
 ├── package.json
 └── tsconfig.json
 ```
 
-## Folder rules
-- `app/` contains routing/screen composition, not business logic.
-- Reusable primitive UI belongs in `src/components/ui`.
-- Swipe-specific reusable UI belongs in `src/components/swipe`.
-- Feature logic stays close to its feature under `src/features`.
-- Cross-feature provider clients/adapters belong in `src/services`.
-- Pure utilities with no React dependency belong in `src/lib`.
-- Theme values are imported from `src/theme`; components do not invent colors/spacing.
-- Fonts and static media live in `assets`.
-- Database changes are migrations, not manual undocumented production edits.
+## Responsibilities
+Routes compose features. UI primitives contain no business logic. SwipeCard renders/animates one normalized Restaurant. SwipeDeck owns the local stack. Discovery feature owns criteria/refill. Provider adapters own external response conversion. Database access is behind small repository/service functions.
 
-## Component responsibilities
-### SwipeCard
-Presentation + pointer/touch gesture animation. Receives normalized restaurant data and emits a semantic swipe decision. It does not fetch restaurants and does not contain Supabase/Google logic.
+## Core domain types
+Restaurant, DiscoveryCriteria, SwipeDirection, SwipeDecision, Favourite, LocationPoint, DistanceInfo and optionally TravelEstimate.
 
-### SwipeDeck
-Owns the small visible/preloaded stack, advances cards, and requests another batch through discovery logic when the buffer becomes low.
+## MVP hooks
+- useDiscovery
+- useSwipeDeck
+- useFavourites
+- useAuth
+- useLocation
 
-### SwipeActions
-Accessible button alternative for Skip/Like. It triggers the same semantic actions as gestures.
+Do not turn every function into a hook.
 
-## Hook policy
-Keep hooks few and feature-oriented. MVP target shape:
-- `useDiscovery()` — candidate batches/loading/filter changes.
-- `useSwipeDeck()` — local deck progression and swipe decisions.
-- `useFavourites()` — persistent likes/favourites.
-- `useAuth()` — session/sign-in state.
-- `useLocation()` — permission/current coarse discovery location behavior.
+## Core functions
+Pure/testable examples:
+- normalizeRestaurant(providerResult)
+- shouldCommitSwipe(displacement, velocity, config)
+- applySwipe(deck, restaurantId, direction)
+- dedupeCandidates(existingIds, candidates)
+- buildDiscoveryCriteria(filters, location)
+- shouldRefillDeck(deckLength, threshold)
 
-Do not create a custom hook for every small operation. Pure functions remain plain functions.
+Integration functions:
+- discoverRestaurants(criteria)
+- recordSwipe(...)
+- saveFavourite(...)
+- removeFavourite(...)
+- getRestaurant(...)
+- getTravelEstimates(...) only when routing exists
 
-## Service policy
-- `places` adapter converts provider responses to SheHungry domain models.
-- `supabase` client is initialized once and imported through one module.
-- UI never imports provider SDK internals directly.
-- Secrets are never committed.
+## State
+Local/feature state first. No global state library until a concrete cross-feature problem justifies it.
 
-## State policy
-Prefer local component/feature state for MVP. Avoid introducing a large global state framework unless implementation demonstrates a real cross-feature need.
+## Configuration
+Centralize swipe thresholds, refill thresholds, batch sizes, feature flags and API-related limits. No magic values scattered in components.
 
-## Styling policy
-- Theme tokens only for colors/spacing/radii/type scales.
-- Responsive layout through shared layout primitives/helpers.
-- Keep platform-specific code isolated and only where input/browser/native behavior genuinely differs.
+## Quality gates
+Every commit intended for main should pass typecheck, lint and relevant tests. No any without justification. No secrets in repo. Database changes are migrations.
 
-## Testing priorities
-1. Swipe threshold/decision logic.
-2. Deck progression and no duplicate visible cards.
-3. Discovery normalization/filter behavior.
-4. Auth-gated favourites.
-5. RLS/database access behavior.
+## Testing
+Unit: swipe decision, deck reducer, dedupe, normalization.
+Integration: repositories/provider adapters, RLS.
+Component: SwipeCard/Deck semantics and buttons.
+E2E/manual: iPhone touch + desktop pointer core journey.
 
-## Code quality
-- Strict TypeScript.
-- Small components.
-- Explicit domain types.
-- No `any` unless documented and unavoidable at an integration boundary.
-- Business rules must be testable without rendering UI.
+## Observability
+Record coarse technical events/errors and provider request counts. Do not create unnecessary precise-location analytics.
+
+## Documentation rule
+When an architectural decision changes, update the relevant /docs file in the same work unit.
