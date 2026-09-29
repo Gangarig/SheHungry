@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "SheHungry",
+    "slug": "shehungry",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": { "supportsTablet": true },
+    "android": { "predictiveBackGestureEnabled": false }
+  }
+}
