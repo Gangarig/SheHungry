@@ -1,77 +1,50 @@
-# SheHungry — API & Cost-Control Specification
+# SheHungry — API, Provider & Cost Blueprint
 
-## Goal
-The swipe experience must not translate into one paid external API request per card. External data is fetched in controlled batches and reused through caching.
+## Objective
+Swiping must never mean one paid provider call per card.
 
-## Active MVP external systems
-### 1. Supabase
-Used for:
-- Postgres data.
-- Authentication.
-- favourites.
-- swipe log/history.
-- restaurant/provider cache.
-- controlled backend operations where needed.
+## MVP systems
+Supabase for app data/auth/RLS. Google Places is the initial restaurant provider. Identity providers are mediated by Supabase Auth. A routing provider is introduced only if true travel-time filtering is part of the implemented scope. Stripe is later.
 
-### 2. Google Places
-Used as the initial external restaurant/place data provider.
+## Provider boundary
+Components consume SheHungry Restaurant objects, not Google payloads. Central adapter/server logic requests only needed fields, normalizes responses and makes provider replacement possible.
 
-Provider access must be wrapped behind a SheHungry service/adapter so the application is not structurally tied to Google response formats.
+## Request triggers
+Provider discovery may happen on initial discovery, meaningful location/filter change, or genuine buffer refill. A left/right swipe itself does not call Places.
 
-### 3. Google / Apple identity
-Used through the authentication layer when social sign-in is enabled. Authentication is not required to begin browsing.
+## Batch/buffer
+Fetch candidate batches; client keeps a small configurable upcoming-card buffer. Refill before exhaustion. Exact values are tuning constants established through testing, not architecture assumptions.
 
-## Not active in MVP
-Stripe is reserved for restaurant subscriptions/boosts in a later version.
+## Cost controls
+- request only fields displayed/needed
+- centralize calls
+- debounce meaningful criteria changes
+- deduplicate equivalent concurrent requests
+- prevent render-driven refetch
+- validate and rate-limit public backend operations
+- monitor provider request counts/errors
+- set provider-side quotas/budget alerts where available
+- cache/reuse only what current provider terms permit
 
-## Request strategy
-### Discovery request
-A discovery request is based on a meaningful change such as:
-- initial location/filter load,
-- user changes travel/filter criteria,
-- card buffer is genuinely running low and more candidates are required.
+## Provider data policy
+Before implementation, verify the current Google Maps Platform/Places terms for what may be stored, for how long, attribution/display requirements and photo handling. Do not assume all provider content can be copied permanently into Supabase. Stable provider identifiers and SheHungry-owned data should be treated separately from restricted provider content.
 
-A swipe itself does **not** trigger a Google Places request.
+## Images
+Load only current/next card images at useful sizes. Do not bulk-download a city’s restaurant photos. Follow provider photo/attribution rules.
 
-## Client card buffer
-The client should receive a batch of normalized restaurant cards and keep several upcoming cards ready. The exact batch/buffer sizes are implementation-tuning values and should be configurable constants, not embedded throughout components.
+## Travel time
+Straight-line distance is cheap and can be calculated locally/server-side. Walking/cycling/driving minutes require route/travel-time data. If no routing provider is active, UI must say distance/radius rather than claiming travel minutes.
 
-## Cache model
-Cache normalized provider restaurant records in Supabase with:
-- provider name,
-- provider place ID,
-- normalized restaurant fields,
-- provider metadata required by the application,
-- last refreshed timestamp.
+## Failure
+Use permissible cached/known candidates when possible. Otherwise show bounded retry/empty state. Never create automatic retry storms.
 
-Where provider terms permit caching of a field, reuse it until stale according to the configured policy. Provider-specific storage/refresh restrictions must be respected during implementation.
+## Application operations
+- discoverRestaurants(criteria)
+- getRestaurant(id)
+- recordSwipe(restaurantId, direction)
+- saveFavourite(restaurantId)
+- removeFavourite(restaurantId)
+- getTravelEstimates(...) only behind RoutingProvider
 
-## Image strategy
-- Do not download every possible restaurant image up front.
-- Preload only the current/next small card set.
-- Store provider references/metadata according to provider rules rather than blindly duplicating external images.
-- Use image sizing appropriate to the displayed card.
-
-## Rate/cost protection
-- Centralize provider calls.
-- Debounce/filter changes that could cause repeated discovery calls.
-- Do not refetch because a component re-rendered.
-- Deduplicate concurrent equivalent requests.
-- Add server-side limits/validation to public callable endpoints.
-- Log provider usage/error categories so unexpected request growth is visible.
-
-## Failure behavior
-If Google Places is temporarily unavailable but usable cached candidates exist, discovery should prefer the cache rather than breaking the swipe experience. If no candidates exist, show a clear retry/empty state rather than looping requests.
-
-## API abstraction
-Application-facing interface conceptually exposes operations such as:
-- `discoverRestaurants(criteria)`
-- `getRestaurant(id)`
-- `recordSwipe(restaurantId, direction)`
-- `saveFavourite(restaurantId)`
-- `removeFavourite(restaurantId)`
-
-These names describe application operations. Components should not know which provider/database calls implement them.
-
-## Future integrations
-Later integrations (Stripe, reservations, delivery providers) receive their own adapters/modules. They must not be placed inside swipe gesture components or the core discovery provider.
+## Future
+Billing, restaurant management, reservations and delivery each get separate adapters/modules. None belongs inside swipe gesture code.
