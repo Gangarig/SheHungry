@@ -1,7 +1,22 @@
 {
   "name": "@shehungry/web",
   "private": true,
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
-  "dependencies": { "@shehungry/core": "*", "next": "15.5.26", "react": "19.2.3", "react-dom": "19.2.3" },
-  "devDependencies": { "@types/node": "^22.0.0", "@types/react": "~19.2.2", "@types/react-dom": "~19.2.2", "typescript": "~6.0.3" }
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shehungry/core": "*",
+    "next": "16.3.7",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "~19.2.0",
+    "@types/react-dom": "~19.2.0",
+    "typescript": "6.0.3"
+  }
 }

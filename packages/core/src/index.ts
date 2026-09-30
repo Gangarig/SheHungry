@@ -1,6 +1,3 @@
-export type Restaurant = { id: string; name: string; cuisine: string; neighbourhood: string; distanceLabel: string; priceLevel: string; rating: number; imageUrl: string; description: string; tags: string[] };
-export const restaurantFixtures: Restaurant[] = [
-  { id: 'mama-liu', name: 'Mama Liu & Sons', cuisine: 'Taiwanese comfort food', neighbourhood: 'Neubau', distanceLabel: '8 min walk', priceLevel: '€€', rating: 4.7, imageUrl: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85', description: 'Silky noodles, bright pickles, and bowls made for lingering.', tags: ['Cosy', 'Vegetarian-friendly'] },
-  { id: 'brunch-club', name: 'Brunch Club', cuisine: 'All-day brunch', neighbourhood: 'Wieden', distanceLabel: '12 min walk', priceLevel: '€€', rating: 4.5, imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=85', description: 'Golden eggs, strong coffee, and a table worth waking up for.', tags: ['Outdoor seats', 'Good for groups'] },
-  { id: 'sora', name: 'Sora', cuisine: 'Japanese small plates', neighbourhood: 'Innere Stadt', distanceLabel: '15 min walk', priceLevel: '€€€', rating: 4.8, imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=85', description: 'A small, warm room for crisp tempura and late-night bites.', tags: ['Date night', 'Reservations'] }
-];
+/** Shared domain contract. Real restaurant records come from Supabase. */
+export type SwipeDecision = 'like' | 'skip';
+export type FeedbackCategory = 'idea' | 'bug' | 'restaurant' | 'other';

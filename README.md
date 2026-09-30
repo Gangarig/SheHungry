@@ -1,30 +1,35 @@
 # SheHungry
 
-SheHungry helps people decide where to eat through fast, local restaurant discovery.
+Guest-first restaurant discovery for Vienna, with 24 curated restaurants in Supabase. Web and native apps save confirmed swipes and favourites, collect private feedback, export guest data and offer permanent self-deletion.
 
-## Project structure
+The web release path is GitHub Pages, with Supabase as the backend. The prepared target is https://gangarig.github.io/shehungry/; it will be available after the repository is pushed, Pages is enabled and the two public Supabase variables are configured. The former ChatGPT Sites deployment is not part of the release path. See `docs/GITHUB_PAGES_RELEASE.md` for setup, `docs/PRODUCTION_RUNBOOK.md` for launch gates, and `docs/PROGRESS.md` for the continuation checkpoint.
 
-```text
-SheHungry/
-├── App.tsx                 # Expo mobile experience (iOS and Android)
-├── apps/web/               # Standalone Next.js web experience
-├── packages/core/          # Shared restaurant model and discovery fixtures
-├── supabase/               # Canonical schema migrations and server configuration
-└── docs/                   # Product, design, architecture and delivery notes
+## Development
+
+Use Node 22.13+ and `npm ci`. Copy `apps/web/.env.example` to `.env.local` and `apps/mobile/.env.example` to `.env` in their respective directories. Supply only a Supabase project URL and publishable key, never a service-role key. Anonymous sign-in is already enabled in the existing SheHungry project.
+
+```sh
+npm run web
+npm run mobile
 ```
 
-The two applications keep their own interface layers. Shared code is intentionally limited to business concepts, types, discovery rules, and API contracts—rather than forcing a single UI across web and native platforms.
+## Validation
 
-## Run locally
-
-```bash
-npm install
-npm run mobile       # Expo / iPhone and Android
-npm run web          # Next.js at http://localhost:3000
+```sh
+npm test
+npm run typecheck
+npm audit --audit-level=moderate
+npm run build:web
 ```
 
-Run `npm run check` before a pull request. Never commit `.env` files or service-role keys.
+From `apps/mobile`, run `npx expo-doctor` and `npx expo export --platform ios --platform android --output-dir dist`. Live backend checks use `npm run test:backend`; read the runbook before executing because they create and delete isolated test identities.
 
-## Backend
+## Architecture
 
-Both apps will use the `shehungry` Supabase project (`lagbygpgoscuehulquwi`). The initial database schema is in `supabase/migrations`; it must be applied to the project before persistence is enabled.
+- `apps/web`: Next static web app, keyboard/touch discovery, cuisine filter, optional on-device location sorting, accessible dialogs.
+- `apps/mobile`: Expo native app, secure chunked keychain sessions, confirmed persistence and feedback/data tools.
+- `supabase/migrations`: five migrations matching remote history, RLS, atomic idempotent saves, per-user quotas, feedback and data export.
+- `supabase/functions/delete-account`: authenticated hard deletion of the caller's guest identity and dependent data.
+- `.github/workflows/verify.yml`: prepared automated validation; activation requires a GitHub push.
+
+The catalogue does not invent ratings, opening hours, travel times or photos. Permanent Google/Apple sign-in, CAPTCHA activation, licensed photos, legal contact details, tested backups/monitoring and device/store distribution remain incomplete. No paid services were purchased.
