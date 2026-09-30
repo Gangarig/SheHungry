@@ -16,12 +16,12 @@
         "name": "next"
       }
     ],
-    "allowJs": true,
     "skipLibCheck": true,
+    "isolatedModules": true,
+    "allowJs": true,
     "incremental": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "resolveJsonModule": true
   },
   "include": [
     "next-env.d.ts",

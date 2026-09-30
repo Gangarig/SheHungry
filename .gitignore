@@ -1,8 +1,7 @@
 node_modules/
 .next/
-out/
 .expo/
 dist/
-.env*
-*.tsbuildinfo
-supabase/.temp/
+out/
+.env
+.env.local
