@@ -1,8 +1,8 @@
 # SheHungry
 
-Guest-first restaurant discovery for Vienna, with 24 curated restaurants in Supabase. Web and native apps save confirmed swipes and favourites, collect private feedback, export guest data and offer permanent self-deletion.
+Minimal restaurant discovery for Vienna, with 24 curated restaurants in Supabase. Web and native apps give visitors two trial swipes, then require Google or Apple sign-in before any further swipe is recorded.
 
-The web release path is GitHub Pages, with Supabase as the backend. The prepared target is https://gangarig.github.io/SheHungry/; it will be available after Pages is enabled and the two public Supabase variables are configured. The former ChatGPT Sites deployment is not part of the release path. See `docs/GITHUB_PAGES_RELEASE.md` for setup, `docs/PRODUCTION_RUNBOOK.md` for launch gates, and `docs/PROGRESS.md` for the continuation checkpoint.
+The web release path is GitHub Pages, with Supabase as the backend. The prepared target is https://gangarig.github.io/shehungry/; it will be available after the repository is pushed, Pages is enabled and the two public Supabase variables are configured. The former ChatGPT Sites deployment is not part of the release path. See `docs/GITHUB_PAGES_RELEASE.md` for setup, `docs/PRODUCTION_RUNBOOK.md` for launch gates, and `docs/PROGRESS.md` for the continuation checkpoint.
 
 ## Development
 
@@ -17,6 +17,7 @@ npm run mobile
 
 ```sh
 npm test
+npm run security:check
 npm run typecheck
 npm audit --audit-level=moderate
 npm run build:web
@@ -30,6 +31,7 @@ From `apps/mobile`, run `npx expo-doctor` and `npx expo export --platform ios --
 - `apps/mobile`: Expo native app, secure chunked keychain sessions, confirmed persistence and feedback/data tools.
 - `supabase/migrations`: five migrations matching remote history, RLS, atomic idempotent saves, per-user quotas, feedback and data export.
 - `supabase/functions/delete-account`: authenticated hard deletion of the caller's guest identity and dependent data.
+- `scripts/security-checkup.mjs`: repeatable shared-Supabase checkup for both client boundaries, the shared contract, RLS, RPC privileges and deletion controls.
 - `.github/workflows/verify.yml`: prepared automated validation; activation requires a GitHub push.
 
-The catalogue does not invent ratings, opening hours, travel times or photos. Permanent Google/Apple sign-in, CAPTCHA activation, licensed photos, legal contact details, tested backups/monitoring and device/store distribution remain incomplete. No paid services were purchased.
+The catalogue does not invent ratings, opening hours, travel times or photos. Google and Apple sign-in code is ready; provider credentials still need to be entered in Supabase as described in `docs/AUTH_SETUP.md`. CAPTCHA activation, licensed photos, legal contact details, tested backups/monitoring and device/store distribution remain incomplete. No paid services were purchased.
