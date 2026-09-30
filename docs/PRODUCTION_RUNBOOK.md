@@ -4,7 +4,7 @@ Verified 30 September 2026. Status: private friends-beta candidate, not public-l
 
 ## Deployed services
 
-- Web: GitHub Pages release prepared for https://gangarig.github.io/shehungry/. It is not live until its GitHub repository is pushed, Pages is set to GitHub Actions, and public Supabase variables are configured. Do not use the former ChatGPT Sites deployment for release or tester sharing.
+- Web: GitHub Pages release prepared for https://gangarig.github.io/SheHungry/. It is not live until Pages is set to GitHub Actions and public Supabase variables are configured. Do not use the former ChatGPT Sites deployment for release or tester sharing.
 - Supabase: `lagbygpgoscuehulquwi`, EU Central. Anonymous sign-in is enabled; 24 published Vienna restaurants.
 - Web: Next 16.3.7. Mobile: Expo 57.0.26 / React Native 0.86.3. Both use React 19.2.3 and Supabase JS 2.117.2.
 - Only public project URL/publishable keys belong in client builds. Never use service-role/secret keys.

@@ -4,12 +4,12 @@ SheHungry's web app is a static Next export. GitHub Pages is the frontend host; 
 
 ## One-time repository setup
 
-1. Create or use the `shehungry` repository under the `gangarig` GitHub account, then push this project to its `main` branch. The expected URL is `https://gangarig.github.io/shehungry/`.
+1. Use the `SheHungry` repository under the `gangarig` GitHub account and push this project to its `main` branch. The expected URL is `https://gangarig.github.io/SheHungry/`.
 2. In **Settings → Pages**, set the publishing source to **GitHub Actions**.
 3. In **Settings → Secrets and variables → Actions → Variables**, add the existing public values `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. They are public client configuration and must never be replaced by a service-role or secret key.
 4. Let the **Deploy SheHungry web** workflow finish, then open the resulting Pages URL and complete the friends-beta smoke test below.
 
-The workflow derives the Pages subpath from the repository name. If the repository is not called `shehungry`, the deployment URL and `EXPO_PUBLIC_WEB_URL` must use that repository name instead.
+The workflow derives the Pages subpath from the repository name. If the repository name changes, the deployment URL and `EXPO_PUBLIC_WEB_URL` must use that repository name instead.
 
 ## First release smoke test
 

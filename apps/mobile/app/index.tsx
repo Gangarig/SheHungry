@@ -4,7 +4,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import {ensureGuestIdentity,loadViennaDiscoveryDeck,persistSwipe,removeFavourite,newRequestId,exportMyData,deleteMyAccount,sendFeedback,friendlyError,type DiscoveryRestaurant} from '../lib/catalogue';
 const C={bg:'#FFF9F5',ink:'#201A17',muted:'#756A64',coral:'#B52640',mint:'#137959',line:'#EEE5DF'};
-const web=process.env.EXPO_PUBLIC_WEB_URL??'https://gangarig.github.io/shehungry';
+const web=process.env.EXPO_PUBLIC_WEB_URL??'https://gangarig.github.io/SheHungry';
 export default function Discovery(){
  const[restaurants,setRestaurants]=useState<DiscoveryRestaurant[]>([]),[saved,setSaved]=useState<DiscoveryRestaurant[]>([]),[state,setState]=useState<'loading'|'ready'|'error'>('loading');
  const[notice,setNotice]=useState(''),[panel,setPanel]=useState<'saved'|'data'|'feedback'|null>(null),[busy,setBusy]=useState(false),[feedback,setFeedback]=useState('');

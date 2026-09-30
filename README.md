@@ -2,7 +2,7 @@
 
 Guest-first restaurant discovery for Vienna, with 24 curated restaurants in Supabase. Web and native apps save confirmed swipes and favourites, collect private feedback, export guest data and offer permanent self-deletion.
 
-The web release path is GitHub Pages, with Supabase as the backend. The prepared target is https://gangarig.github.io/shehungry/; it will be available after the repository is pushed, Pages is enabled and the two public Supabase variables are configured. The former ChatGPT Sites deployment is not part of the release path. See `docs/GITHUB_PAGES_RELEASE.md` for setup, `docs/PRODUCTION_RUNBOOK.md` for launch gates, and `docs/PROGRESS.md` for the continuation checkpoint.
+The web release path is GitHub Pages, with Supabase as the backend. The prepared target is https://gangarig.github.io/SheHungry/; it will be available after Pages is enabled and the two public Supabase variables are configured. The former ChatGPT Sites deployment is not part of the release path. See `docs/GITHUB_PAGES_RELEASE.md` for setup, `docs/PRODUCTION_RUNBOOK.md` for launch gates, and `docs/PROGRESS.md` for the continuation checkpoint.
 
 ## Development
 
