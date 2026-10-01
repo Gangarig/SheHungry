@@ -1,18 +1,39 @@
 {
   "name": "shehungry",
-  "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "web": "npm run dev --workspace=@shehungry/web",
     "mobile": "npm run start --workspace=@shehungry/mobile",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "node --import tsx --test tests/*.test.ts",
+    "test:backend": "node scripts/check-backend.mjs",
     "build:web": "npm run build --workspace=@shehungry/web"
   },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "4.26.0"
+  },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3"
   },
+  "private": true,
   "packageManager": "npm@10.9.9",
-  "engines": { "node": ">=22.13.0" }
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "11.1.1"
+    }
+  }
 }

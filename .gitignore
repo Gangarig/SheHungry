@@ -1,7 +1,8 @@
 node_modules/
 .next/
+out/
 .expo/
 dist/
-out/
 .env
 .env.local
+*.tsbuildinfo

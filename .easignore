@@ -1,0 +1,14 @@
+node_modules/
+**/node_modules/
+sources/
+**/.next/
+**/out/
+**/dist/
+**/.expo/
+**/*.tsbuildinfo
+.env
+.env.local
+**/.env
+**/.env.local
+**/.env.production
+supabase/

@@ -1,0 +1,21 @@
+import {randomUUID} from 'expo-crypto';
+import {supabase,supabaseConfigurationError} from './supabase';
+export type DiscoveryRestaurant={id:string;name:string;cuisine:string;neighbourhood:string;priceLabel:string;imageUrl:string|null;description:string;address:string|null;websiteUrl:string|null;tags:string[];latitude:number;longitude:number};
+export type SwipeDecision='like'|'skip';
+function client(){if(!supabase)throw Error(supabaseConfigurationError??'Connection unavailable');return supabase;}
+export function friendlyError(error:unknown){const msg=error&&typeof error==='object'&&'message'in error?String(error.message):'';if(/captcha/i.test(msg))return 'A security check is needed. Open the web beta to continue, or contact the beta organiser.';if(/rate[_ ]limit|too many/i.test(msg))return 'Please wait a minute before trying again.';return 'We could not reach the service. Check your connection and try again.';}
+let identity:Promise<{id:string}>|null=null;
+let catalogueCache:{rows:DiscoveryRestaurant[];at:number}|null=null;
+let nextMutationAt=0;
+const cacheMs=5*60_000;
+function limitClientMutation(){const now=Date.now();if(now<nextMutationAt)throw Error('rate_limited');nextMutationAt=now+600;}
+export function ensureGuestIdentity(){if(identity)return identity;identity=(async()=>{const c=client();const {data,error}=await c.auth.getSession();if(error)throw error;if(data.session)return data.session.user;const result=await c.auth.signInAnonymously();if(result.error)throw result.error;if(!result.data.user)throw Error('Guest unavailable');return result.data.user;})().finally(()=>{identity=null;});return identity;}
+const safeUrl=(value:string|null)=>{if(!value)return null;try{const u=new URL(value);return u.protocol==='https:'||u.protocol==='http:'?u.href:null;}catch{return null;}};
+export async function loadViennaDiscoveryDeck(){const c=client();const cached=catalogueCache&&Date.now()-catalogueCache.at<cacheMs?catalogueCache.rows:null;const [rs,ss,fs]=await Promise.all([cached?Promise.resolve({data:cached,error:null}):c.from('restaurants').select('id,name,latitude,longitude,cuisine_types,price_level,image_url,description,address,neighbourhood,tags,website_url').eq('provider','manual').like('provider_place_id','vienna-%').order('name'),c.from('swipes').select('restaurant_id'),c.from('favourites').select('restaurant_id')]);for(const r of [rs,ss,fs])if(r.error)throw r.error;
+const fresh=(rs.data??[]) as any[];const all:DiscoveryRestaurant[]=cached??fresh.map(r=>({id:r.id,name:r.name,cuisine:r.cuisine_types?.join(' · ')||'Curated pick',neighbourhood:r.neighbourhood||'Vienna',priceLabel:r.price_level?'€'.repeat(Math.min(4,r.price_level)):'Price not listed',imageUrl:safeUrl(r.image_url),description:r.description||'A curated Vienna restaurant.',address:r.address,websiteUrl:safeUrl(r.website_url),tags:r.tags??[],latitude:r.latitude,longitude:r.longitude}));if(!cached)catalogueCache={rows:all,at:Date.now()};const seen=new Set(ss.data?.map(s=>s.restaurant_id)),savedIds=new Set(fs.data?.map(f=>f.restaurant_id));return{restaurants:all.filter(r=>!seen.has(r.id)),saved:all.filter(r=>savedIds.has(r.id))};}
+export const newRequestId=()=>randomUUID();
+export async function persistSwipe(restaurantId:string,decision:SwipeDecision,requestId:string){limitClientMutation();const {error}=await client().rpc('record_swipe',{p_restaurant_id:restaurantId,p_decision:decision,p_request_id:requestId});if(error)throw error;}
+export async function removeFavourite(restaurantId:string){limitClientMutation();const{error}=await client().from('favourites').delete().eq('restaurant_id',restaurantId);if(error)throw error;}
+export async function exportMyData(){const{data,error}=await client().rpc('export_my_data');if(error)throw error;return data;}
+export async function deleteMyAccount(){const{data,error}=await client().functions.invoke('delete-account',{body:{confirmation:'DELETE'}});if(error||!data?.deleted)throw error??Error('Deletion incomplete');await client().auth.signOut({scope:'local'});}
+export async function sendFeedback(message:string){limitClientMutation();const{data,error}=await client().auth.getSession();if(error||!data.session)throw error??Error('Session unavailable');const r=await client().from('beta_feedback').insert({user_id:data.session.user.id,category:'idea',message:message.trim()});if(r.error)throw r.error;}
