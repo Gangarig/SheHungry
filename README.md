@@ -2,7 +2,7 @@
 
 Guest-first restaurant discovery for Vienna, with 24 curated restaurants in Supabase. Web and native apps save confirmed swipes and favourites, collect private feedback, export guest data and offer permanent self-deletion.
 
-The web beta is deployed from this GitHub repository. Cloudflare Pages deployment is the release path; public release and independent friend access are not yet enabled. See `docs/PRODUCTION_RUNBOOK.md` for verified checks and launch gates.
+The web beta is publicly available at [gangarig.github.io/SheHungry](https://gangarig.github.io/SheHungry/) and deploys automatically from `main` through GitHub Pages. It remains a friends beta, not a public-launch-approved service. See `docs/PRODUCTION_RUNBOOK.md` for verified checks and launch gates.
 
 ## Development
 
@@ -26,10 +26,10 @@ From `apps/mobile`, run `npx expo-doctor` and `npx expo export --platform ios --
 
 ## Architecture
 
-- `apps/web`: Next static web app, keyboard/touch discovery, cuisine filter, optional on-device location sorting, accessible dialogs.
+- `apps/web`: Next static web app, keyboard/touch discovery, optional on-device location sorting, accessible dialogs.
 - `apps/mobile`: Expo native app, secure chunked keychain sessions, confirmed persistence and feedback/data tools.
 - `supabase/migrations`: five migrations matching remote history, RLS, atomic idempotent saves, per-user quotas, feedback and data export.
 - `supabase/functions/delete-account`: authenticated hard deletion of the caller's guest identity and dependent data.
-- `.github/workflows/verify.yml`: prepared automated validation; activation requires a GitHub push.
+- `.github/workflows/verify.yml`: automated validation on each push and pull request.
 
 The catalogue does not invent ratings, opening hours, travel times or photos. Permanent Google/Apple sign-in, CAPTCHA activation, licensed photos, legal contact details, tested backups/monitoring and device/store distribution remain incomplete. No paid services were purchased.

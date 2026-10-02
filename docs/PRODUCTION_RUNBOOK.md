@@ -1,10 +1,10 @@
 # SheHungry production runbook
 
-Verified 30 September 2026. Status: private friends-beta candidate, not public-launch approved.
+Verified 2 October 2026. Status: public friends beta on GitHub Pages, not public-launch approved.
 
 ## Deployed services
 
-- Web: deploy from the `main` branch through Cloudflare Pages. Keep the preview private until launch gates are complete.
+- Web: deploy from the `main` branch through GitHub Pages at `https://gangarig.github.io/SheHungry/`. Keep the beta noindex until launch gates are complete.
 - Supabase: `lagbygpgoscuehulquwi`, EU Central. Anonymous sign-in is enabled; 24 published Vienna restaurants.
 - Web: Next 16.3.7. Mobile: Expo 57.0.26 / React Native 0.86.3. Both use React 19.2.3 and Supabase JS 2.117.2.
 - Only public project URL/publishable keys belong in client builds. Never use service-role/secret keys.
@@ -51,7 +51,7 @@ Testers use **Share feedback**; messages are private to their guest and the owne
 4. Add health monitoring and alert ownership, including auth/signup failures, database errors and quota/billing thresholds. No external monitor is currently active.
 5. Complete Chrome/Safari/Firefox, narrow viewport, iPhone and Android install/restart/offline tests. Chrome saving across refresh, modal Escape and feedback were checked. Real devices remain unverified.
 6. Review restaurant facts and obtain licensed photographs. Current cards use honest fallback artwork; no restaurant-photo licence is implied. Follow `EDITORIAL.md`.
-7. Only after these gates pass, deliberately change the site audience. Owner-private hosting is not a shareable friends link. Invitation-only access can be considered earlier after confirming tester emails and privacy information.
+7. Only after these gates pass, deliberately remove the friends-beta restrictions and make the site indexable. Invitation-only access can be considered after confirming tester emails and privacy information.
 
 ## Mobile distribution
 
@@ -59,4 +59,4 @@ Testers use **Share feedback**; messages are private to their guest and the owne
 
 ## Incidents and rollback
 
-Keep the Cloudflare Pages deployment private or roll back to the last known good GitHub commit if a release is broken. Database migrations require a reviewed forward fix or tested restore; reverting the website does not reverse schema changes. For suspected exposure, restrict affected API access, preserve relevant logs securely, investigate scope and follow the owner's applicable notification obligations. Never delete user data as a diagnostic shortcut.
+Roll back to the last known good GitHub commit if a release is broken. Database migrations require a reviewed forward fix or tested restore; reverting the website does not reverse schema changes. For suspected exposure, restrict affected API access, preserve relevant logs securely, investigate scope and follow the owner's applicable notification obligations. Never delete user data as a diagnostic shortcut.
